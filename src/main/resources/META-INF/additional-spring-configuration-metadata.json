@@ -1,0 +1,54 @@
+{
+  "groups": [
+    {
+      "name": "httpclient",
+      "type": "com.accelerator.framework.spring.boot.autoconfigure.httpclient.HttpClientProperties",
+      "sourceType": "com.accelerator.framework.spring.boot.autoconfigure.httpclient.HttpClientProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "httpclient.pool-max-total",
+      "type": "java.lang.Integer",
+      "sourceType": "com.accelerator.framework.spring.boot.autoconfigure.httpclient.HttpClientProperties",
+      "defaultValue": 20
+    },
+    {
+      "name": "httpclient.pool-default-max-per-route",
+      "type": "java.lang.Integer",
+      "sourceType": "com.accelerator.framework.spring.boot.autoconfigure.httpclient.HttpClientProperties",
+      "defaultValue": 20
+    },
+    {
+      "name": "httpclient.max-conn-per-route",
+      "type": "java.lang.Integer",
+      "sourceType": "com.accelerator.framework.spring.boot.autoconfigure.httpclient.HttpClientProperties",
+      "defaultValue": 20
+    },
+    {
+      "name": "httpclient.request-retry-count",
+      "type": "java.lang.Integer",
+      "sourceType": "com.accelerator.framework.spring.boot.autoconfigure.httpclient.HttpClientProperties",
+      "defaultValue": 3
+    },
+    {
+      "name": "httpclient.connect-timeout",
+      "type": "java.lang.Integer",
+      "sourceType": "com.accelerator.framework.spring.boot.autoconfigure.httpclient.HttpClientProperties",
+      "defaultValue": 1000
+    },
+    {
+      "name": "httpclient.connection-request-timeout",
+      "type": "java.lang.Integer",
+      "sourceType": "com.accelerator.framework.spring.boot.autoconfigure.httpclient.HttpClientProperties",
+      "defaultValue": 1000
+    },
+    {
+      "name": "httpclient.socket-timeout",
+      "type": "java.lang.Integer",
+      "sourceType": "com.accelerator.framework.spring.boot.autoconfigure.httpclient.HttpClientProperties",
+      "defaultValue": 5000
+    }
+  ],
+  "hints": []
+}

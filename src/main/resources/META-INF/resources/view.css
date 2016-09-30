@@ -1,0 +1,57 @@
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    background-color: #333;
+    text-align: center;
+    color: #fff;
+}
+
+.jumbotron {
+    margin-top: 100px;
+    background-color: inherit;
+}
+
+.table > tbody > tr > td,
+.table > tbody > tr > th,
+.table > tfoot > tr > td,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > thead > tr > th {
+    text-align: center;
+    font-size: 15px;
+    vertical-align: middle;
+}
+
+select.type-select {
+    height: auto;
+    line-height: normal;
+    width: auto;
+    display: inline;
+}
+
+.footer {
+    display: block;
+    width: 100%;
+    color: rgba(255, 255, 255, .5);
+}
+
+@media (min-width: 1204px) and (min-height: 853px) {
+    .footer {
+        position: fixed;
+        bottom: 2%;
+    }
+}
+
+@media (max-width: 1204px) or (max-height: 853px) {
+    .footer {
+        position: absolute;
+        padding-bottom: 2%;
+    }
+}
+
+.footer * a {
+    color: #fff;
+}

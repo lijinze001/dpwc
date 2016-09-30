@@ -1,0 +1,22 @@
+╰╮╰ ╰ ╰╮
+╭╯╭╯╰╮╰╮
+╰╮╰╮ ╭ ╯
+╭ ╯╭╯╭╯
+███████
+█ 南山咖啡 █═╮
+███████ ▏▏
+███████═╯
+◥█████◤
+°☆°～冷冷的滴天气里～°☆°
+°☆°～带来一杯热咖啡～°☆°
+°☆°～温暖尼滴心哟!!～°☆
+******************** Welcome to Dpwc ********************
+Dpwc Version: ${application.version:1.0}
+Java Home: ${java.home}
+Java Vendor: ${java.vendor}
+Java Version: ${java.version}
+OS Architecture: ${os.arch}
+OS Name: ${os.name}
+OS Version: ${os.version}
+SpringBoot Version: ${spring-boot.version}
+*********************************************************
