@@ -101,10 +101,10 @@
                             <input name="date" type="hidden"
                                    th:value="${#dates.format(clock.id.date, 'yyyy-MM-dd')}"/>
                             <select name="type" class="form-control input-sm type-select">
-                                <option th:selected="${clock.type eq -1}" style="color: red;" value="-1">不打卡</option>
-                                <option th:selected="${clock.type eq 0}" style="color: orange;" value="0">上班卡</option>
-                                <option th:selected="${clock.type eq 1}" style="color: orchid;" value="1">下班卡</option>
-                                <option th:selected="${clock.type eq 2}" style="color: black;" value="2">全天卡</option>
+                                <option th:utext="#{view.schedule.clock.type.none}" th:selected="${clock.type eq -1}" style="color: red;" value="-1">不打卡</option>
+                                <option th:utext="#{view.schedule.clock.type.in}" th:selected="${clock.type eq 0}" style="color: orange;" value="0">上班卡</option>
+                                <option th:utext="#{view.schedule.clock.type.out}" th:selected="${clock.type eq 1}" style="color: orchid;" value="1">下班卡</option>
+                                <option th:utext="#{view.schedule.clock.type.all}" th:selected="${clock.type eq 2}" style="color: black;" value="2">全天卡</option>
                             </select>
                         </form>
                     </td>
@@ -129,10 +129,10 @@
                         <form th:action="@{/schedule}" action="#" method="post" role="form">
                             <input name="date" type="hidden" th:value="${#dates.format(clock.id.date, 'yyyy-MM-dd')}"/>
                             <select name="type" class="form-control input-sm type-select">
-                                <option th:selected="${clock.type eq -1}" style="color: red;" value="-1">不打卡</option>
-                                <option th:selected="${clock.type eq 0}" style="color: orange;" value="0">上班卡</option>
-                                <option th:selected="${clock.type eq 1}" style="color: orchid;" value="1">下班卡</option>
-                                <option th:selected="${clock.type eq 2}" style="color: black;" value="2">全天卡</option>
+                                <option th:utext="#{view.schedule.clock.type.none}" th:selected="${clock.type eq -1}" style="color: red;" value="-1">不打卡</option>
+                                <option th:utext="#{view.schedule.clock.type.in}" th:selected="${clock.type eq 0}" style="color: orange;" value="0">上班卡</option>
+                                <option th:utext="#{view.schedule.clock.type.out}" th:selected="${clock.type eq 1}" style="color: orchid;" value="1">下班卡</option>
+                                <option th:utext="#{view.schedule.clock.type.all}" th:selected="${clock.type eq 2}" style="color: black;" value="2">全天卡</option>
                             </select>
                         </form>
                     </td>
