@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface ClockRepository extends JpaRepository<Clock, Clock.Id> {
 
-    List<Clock> findByIdUserUsernameAndIdDateBetween(String username, Date min, Date max);
+    List<Clock> findByIdUserUsernameAndIdDateBetween(String username, Date minDate, Date maxDate);
 
 }

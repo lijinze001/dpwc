@@ -1,6 +1,5 @@
 package com.accelerator.dpwc;
 
-import com.accelerator.dpwc.exception.DpoaClientException;
 import com.accelerator.framework.httpclient.HttpClientHelper;
 import com.accelerator.framework.httpclient.ResponseData;
 import com.google.common.collect.Lists;
@@ -22,6 +21,8 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.net.URLEncoder;
@@ -32,6 +33,8 @@ import java.util.Locale;
 import java.util.Map;
 
 public abstract class DpoaClient {
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(DpoaClient.class);
 
     private static final String USER_AGENT = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E)";
 
@@ -116,7 +119,7 @@ public abstract class DpoaClient {
                 }
             }
         } catch (Exception e) {
-            throw new DpoaClientException(e);
+            LOGGER.error("{}密码校验异常！", username, e);
         }
         return false;
     }
@@ -170,7 +173,7 @@ public abstract class DpoaClient {
                 }
             }
         } catch (Exception e) {
-            throw new DpoaClientException(e);
+            LOGGER.error("{}获取假期异常！", username, e);
         }
         return Collections.emptyList();
     }
@@ -224,7 +227,7 @@ public abstract class DpoaClient {
                 return true;
             }
         } catch (Exception e) {
-            throw new DpoaClientException(e);
+            LOGGER.error("{}打卡异常！", username, e);
         }
         return false;
 

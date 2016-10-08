@@ -1,7 +1,7 @@
 package com.accelerator.dpwc.schedule;
 
 import com.accelerator.dpwc.service.DpwcService;
-import org.apache.commons.lang3.RandomUtils;
+import com.accelerator.dpwc.util.ScheduleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -18,21 +18,21 @@ public class DpwcSchedule {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
     @Resource
     private DpwcService dpwcService;
 
     @Scheduled(cron = "0 30 7 * * ? ")
     public void clockInScheduler() {
-        executorService.schedule(new clockRunner(true), // 20分钟内随机挑时间执行
-                RandomUtils.nextInt(0, 20 * 60 + 1), TimeUnit.SECONDS);
+        scheduledExecutorService.schedule(new clockRunner(true), // 10分钟内随机挑时间执行
+                ScheduleUtils.randomSecondWithTenMinutes(), TimeUnit.SECONDS);
     }
 
     @Scheduled(cron = "0 30 21 * * ? ")
     public void clockOutScheduler() {
-        executorService.schedule(new clockRunner(false), // 20分钟内随机挑时间执行
-                RandomUtils.nextInt(0, 20 * 60 + 1), TimeUnit.SECONDS);
+        scheduledExecutorService.schedule(new clockRunner(false), // 10分钟内随机挑时间执行
+                ScheduleUtils.randomSecondWithTenMinutes(), TimeUnit.SECONDS);
     }
 
     private class clockRunner implements Runnable {
@@ -50,6 +50,7 @@ public class DpwcSchedule {
             dpwcService.schedule(isClockIn);
             logger.info("结束执行{}打卡", clockDisplay);
         }
+
     }
 
 }
