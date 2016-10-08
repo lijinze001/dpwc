@@ -138,12 +138,6 @@
             <artifactId>bootstrap</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.picketbox</groupId>
-            <artifactId>picketbox</artifactId>
-            <version>4.9.7.Final</version>
-        </dependency>
-
     </dependencies>
     <build>
         <plugins>
