@@ -124,7 +124,7 @@ public abstract class DpoaClient {
         return false;
     }
 
-    public static List<Date> holidays(String username, String password) {
+    public static List<Date> holidays(String username, String password, String monthStr) {
         try {
             // 定义登录URL地址
             String url = "http://ioa.deppon.com/portal/login/login_loginIn.action";
@@ -157,7 +157,7 @@ public abstract class DpoaClient {
             // 定义获取假日URL地址
             url = "http://ioa.deppon.com/portal/main/calendar_getSelectCalendar.action";
             // 构建获取假日参数 (获取当前月请求字符串格式)
-            params = Collections.singletonMap("vdate", DateFormatUtils.format(new Date(), "yyyy-M"));
+            params = Collections.singletonMap("vdate", monthStr);
             if (responseData.getStatusCode() == HttpStatus.SC_MOVED_TEMPORARILY) {
                 // 执行获取假日请求
                 responseData = HttpClientHelper.doPost(url, HOLIDAY_HEADERS, responseData.getCookies(), params);

@@ -224,11 +224,11 @@ public class DpwcServiceImpl implements DpwcService, InitializingBean {
     }
 
     protected List<Date> getHolidayDates(String username, String password, Date monthDate) {
-        String cacheKey = username + ":" + DateFormatUtils.format(monthDate, "yyyy-MM");
+        String cacheKey = username + ":" + DateFormatUtils.format(monthDate, "yyyy-M");
         @SuppressWarnings("unchecked")
         List<Date> result = cacheManager.getCache("holidays").get(cacheKey, List.class);
         if (result == null) {
-            result = DpoaClient.holidays(username, password);
+            result = DpoaClient.holidays(username, password, cacheKey);
             cacheManager.getCache("holidays").put(cacheKey, result);
         }
         return result;
