@@ -9,7 +9,6 @@ import com.accelerator.dpwc.domain.UserRepository;
 import com.accelerator.dpwc.exception.DateParseException;
 import com.accelerator.dpwc.service.DpwcService;
 import com.accelerator.dpwc.util.ScheduleUtils;
-import com.accelerator.framework.spring.ApplicationContextHolder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
@@ -24,6 +23,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,7 +44,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service("dpwcService") @EnableCaching
-public class DpwcServiceImpl implements DpwcService, InitializingBean {
+public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcService, InitializingBean {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -164,9 +164,9 @@ public class DpwcServiceImpl implements DpwcService, InitializingBean {
             }
             if (DateUtils.isSameDay(nowDate, clock.getId().getDate())) {
                 if (DpoaClient.clock(username, password, isClockIn)) {
-                    logger.info("{}打卡成功！", username);
+                    logger.info("{}{}打卡成功！", username, isClockIn ? "上班" : "下班");
                 } else {
-                    logger.info("{}打卡失败！", username);
+                    logger.info("{}{}打卡失败！", username, isClockIn ? "上班" : "下班");
                 }
                 break;
             }
@@ -233,7 +233,7 @@ public class DpwcServiceImpl implements DpwcService, InitializingBean {
         String cacheHolidayKey = username + ":" + dataStr;
         @SuppressWarnings("unchecked")
         List<Date> result = cacheHolidays.get(cacheHolidayKey, List.class);
-        if (CollectionUtils.isEmpty(result)) {
+        if (CollectionUtils.isEmpty(result)) { // 暂时不考虑一个月无假期的情况
             result = DpoaClient.holidays(username, password, dataStr);
             cacheHolidays.put(cacheHolidayKey, result);
         }
@@ -247,12 +247,12 @@ public class DpwcServiceImpl implements DpwcService, InitializingBean {
     }
 
     protected void initializeCacheHolidays() {
-        ApplicationContext applicationContext = ApplicationContextHolder.get();
+        ApplicationContext applicationContext = getApplicationContext();
         CacheManager cacheManager = applicationContext.getBean("cacheManager", CacheManager.class);
         cacheHolidays = cacheManager.getCache("holidays");
     }
 
-    public void resizeScheduledThreadPool() {
+    protected void resizeScheduledThreadPool() {
         scheduledExecutorService = Executors
                 .newScheduledThreadPool((int) userRepository.count());
     }

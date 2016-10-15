@@ -227,7 +227,7 @@ public abstract class DpoaClient {
                 return true;
             }
         } catch (Exception e) {
-            LOGGER.error("{}打卡异常！", username, e);
+            LOGGER.error("{}{}打卡异常！", username, isClockIn ? "上班" : "下班", e);
         }
         return false;
 
