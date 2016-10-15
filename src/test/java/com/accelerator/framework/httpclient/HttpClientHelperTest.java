@@ -18,7 +18,7 @@ public class HttpClientHelperTest {
     public void doGet() throws Exception {
         String username = "318898";
         String password = "C@763124";
-        logger.info(String.valueOf(DpoaClient.clock(username, password, false)));
+        logger.info(String.valueOf(DpoaClient.holidays(username, password, "2016-9")));
     }
 
 }

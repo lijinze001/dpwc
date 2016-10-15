@@ -9,6 +9,7 @@ import com.accelerator.dpwc.domain.UserRepository;
 import com.accelerator.dpwc.exception.DateParseException;
 import com.accelerator.dpwc.service.DpwcService;
 import com.accelerator.dpwc.util.ScheduleUtils;
+import com.accelerator.framework.spring.ApplicationContextHolder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
@@ -19,13 +20,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
@@ -46,14 +50,13 @@ public class DpwcServiceImpl implements DpwcService, InitializingBean {
 
     private volatile ScheduledExecutorService scheduledExecutorService;
 
+    private Cache cacheHolidays;
+
     @Autowired @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
     private SecurityProperties security;
 
     @Resource
     private ClockRepository clockRepository;
-
-    @Resource @SuppressWarnings("SpringJavaAutowiringInspection")
-    private CacheManager cacheManager;
 
     @Resource
     private UserRepository userRepository;
@@ -155,6 +158,7 @@ public class DpwcServiceImpl implements DpwcService, InitializingBean {
                     if (!isClockIn) break;
                 case Constants.CLOCK_TYPE_IN:
                     if (isClockIn) break;
+                case Constants.CLOCK_TYPE_NONE:
                 default:
                     continue;
             }
@@ -164,6 +168,7 @@ public class DpwcServiceImpl implements DpwcService, InitializingBean {
                 } else {
                     logger.info("{}打卡失败！", username);
                 }
+                break;
             }
         }
     }
@@ -224,12 +229,13 @@ public class DpwcServiceImpl implements DpwcService, InitializingBean {
     }
 
     protected List<Date> getHolidayDates(String username, String password, Date monthDate) {
-        String cacheKey = username + ":" + DateFormatUtils.format(monthDate, "yyyy-M");
+        String dataStr = DateFormatUtils.format(monthDate, "yyyy-M");
+        String cacheHolidayKey = username + ":" + dataStr;
         @SuppressWarnings("unchecked")
-        List<Date> result = cacheManager.getCache("holidays").get(cacheKey, List.class);
-        if (result == null) {
-            result = DpoaClient.holidays(username, password, cacheKey);
-            cacheManager.getCache("holidays").put(cacheKey, result);
+        List<Date> result = cacheHolidays.get(cacheHolidayKey, List.class);
+        if (CollectionUtils.isEmpty(result)) {
+            result = DpoaClient.holidays(username, password, dataStr);
+            cacheHolidays.put(cacheHolidayKey, result);
         }
         return result;
     }
@@ -240,6 +246,12 @@ public class DpwcServiceImpl implements DpwcService, InitializingBean {
         return authentication.getPrincipal().toString();
     }
 
+    protected void initializeCacheHolidays() {
+        ApplicationContext applicationContext = ApplicationContextHolder.get();
+        CacheManager cacheManager = applicationContext.getBean("cacheManager", CacheManager.class);
+        cacheHolidays = cacheManager.getCache("holidays");
+    }
+
     public void resizeScheduledThreadPool() {
         scheduledExecutorService = Executors
                 .newScheduledThreadPool((int) userRepository.count());
@@ -248,5 +260,7 @@ public class DpwcServiceImpl implements DpwcService, InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         resizeScheduledThreadPool();
+        initializeCacheHolidays();
     }
+
 }

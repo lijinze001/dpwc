@@ -25,21 +25,21 @@ public class DpwcSchedule {
 
     @Scheduled(cron = "0 30 7 * * ? ")
     public void clockInScheduler() {
-        scheduledExecutorService.schedule(new clockRunner(true), // 10分钟内随机挑时间执行
+        scheduledExecutorService.schedule(new ClockRunnable(true), // 10分钟内随机挑时间执行
                 ScheduleUtils.randomSecondWithTenMinutes(), TimeUnit.SECONDS);
     }
 
-    @Scheduled(cron = "0 30 21 * * ? ")
+    @Scheduled(cron = "0 0 22 * * ? ")
     public void clockOutScheduler() {
-        scheduledExecutorService.schedule(new clockRunner(false), // 10分钟内随机挑时间执行
+        scheduledExecutorService.schedule(new ClockRunnable(false), // 10分钟内随机挑时间执行
                 ScheduleUtils.randomSecondWithTenMinutes(), TimeUnit.SECONDS);
     }
 
-    private class clockRunner implements Runnable {
+    private class ClockRunnable implements Runnable {
 
         private boolean isClockIn;
 
-        public clockRunner(boolean isClockIn) {
+        public ClockRunnable(boolean isClockIn) {
             this.isClockIn = isClockIn;
         }
 
