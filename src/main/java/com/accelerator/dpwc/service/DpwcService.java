@@ -1,6 +1,8 @@
 package com.accelerator.dpwc.service;
 
 import com.accelerator.dpwc.domain.Clock;
+import com.accelerator.dpwc.domain.User;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Map;
@@ -10,6 +12,8 @@ public interface DpwcService {
     void addUser(String username, String password);
 
     void delUser(String username);
+
+    Page<User> getUsers(Integer pageNum);
 
     List<Clock> getClocks(String dateStr);
 

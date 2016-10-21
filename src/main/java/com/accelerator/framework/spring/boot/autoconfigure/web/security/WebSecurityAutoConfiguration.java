@@ -81,6 +81,46 @@ public class WebSecurityAutoConfiguration {
         }
     }
 
+    @Configuration
+    public static class AdminSecurityConfiguration {
+
+        @Bean @ConditionalOnMissingBean(AdminWebSecurityConfigurerAdapter.class)
+        public AdminWebSecurityConfigurerAdapter adminWebSecurityConfigurerAdapter() {
+            return new AdminWebSecurityConfigurerAdapter();
+        }
+
+        @Order(ManagementServerProperties.ACCESS_OVERRIDE_ORDER - 1)
+        protected static class AdminWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+
+            @Autowired
+            private SecurityProperties security;
+
+            @Autowired
+            private ManagementServerProperties management;
+
+            private void configurePermittedRequests(
+                    ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry requests) {
+                List<String> roles = management.getSecurity().getRoles();
+                requests.anyRequest().hasAnyRole(roles.toArray(new String[roles.size()]));
+            }
+
+            @Override
+            public void configure(HttpSecurity http) throws Exception {
+                if (this.security.isRequireSsl()) {
+                    http.requiresChannel().anyRequest().requiresSecure();
+                }
+                http.requestMatcher(new AntPathRequestMatcher("/admin/**"));
+                http.sessionManagement().sessionCreationPolicy(management.getSecurity().getSessions());
+                http.httpBasic().realmName(security.getBasic().getRealm());
+                http.csrf().disable();
+                http.headers().frameOptions().sameOrigin();
+                configurePermittedRequests(http.authorizeRequests());
+            }
+
+        }
+
+    }
+
     @Configuration @ConditionalOnClass(H2ConsoleAutoConfiguration.class)
     @AutoConfigureAfter(H2ConsoleAutoConfiguration.class) @EnableConfigurationProperties(H2ConsoleProperties.class)
     @ConditionalOnProperty(prefix = "security.basic", name = "enabled", havingValue = "false")
