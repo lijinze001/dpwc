@@ -2,13 +2,13 @@ package com.accelerator.dpwc;
 
 import com.accelerator.framework.httpclient.HttpClientHelper;
 import com.accelerator.framework.httpclient.ResponseData;
+import com.accelerator.framework.util.DateUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
@@ -92,7 +92,7 @@ public abstract class DpoaClient {
             ResponseData responseData = HttpClientHelper.doGet("http://hr.deppon.com:9080/eos-default/dip.integrateorg.oaAttence.oaAttence.flow");
             // 构建用户名密码校验URL地址
             String url = "http://hr.deppon.com:9080/eos-default/dip.integrateorg.oaAttence.oaAttence.check.bizx.ajax";
-            String paramTime = DateFormatUtils.format(new Date(), "EEE MMM d HH:mm:ss 'UTC'Z yyyy", Locale.US);
+            String paramTime = DateFormatUtils.format(DateUtils.createNow(), "EEE MMM d HH:mm:ss 'UTC'Z yyyy", Locale.US);
             url = HttpClientHelper.formatUrl(url, Collections.singletonMap("time", paramTime));
             // 构建用户名密码校验Cookies
             List<Cookie> cookies = responseData.getCookies();

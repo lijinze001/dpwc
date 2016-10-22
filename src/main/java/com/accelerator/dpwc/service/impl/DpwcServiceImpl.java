@@ -8,12 +8,12 @@ import com.accelerator.dpwc.domain.User;
 import com.accelerator.dpwc.domain.UserRepository;
 import com.accelerator.dpwc.exception.DateParseException;
 import com.accelerator.dpwc.service.DpwcService;
+import com.accelerator.framework.util.DateUtils;
 import com.accelerator.dpwc.util.ScheduleUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -24,6 +24,10 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ApplicationObjectSupport;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -64,7 +68,7 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
     @Override @Transactional(rollbackFor = Throwable.class)
     public void addUser(String username, String password) {
         User user = userRepository.findOne(username);
-        Date nowDate = new Date();
+        Date nowDate = DateUtils.createNow();
         if (user == null) {
             user = new User(username);
             user.setCreateUser(username);
@@ -77,9 +81,28 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         resizeScheduledThreadPool();
     }
 
-    @Override
+    @Override @Transactional(rollbackFor = Throwable.class)
     public void delUser(String username) {
+        if (StringUtils.isEmpty(username) || security.getUser().getName().equals(username)) {
+            return;
+        }
+        Date sameMonth = DateUtils.createNow();
+        Date nextMonth = DateUtils.addMonths(sameMonth, 1);
+        String sameMonthStr = DateFormatUtils.format(sameMonth, "yyyy-M");
+        String nextMonthStr = DateFormatUtils.format(nextMonth, "yyyy-M");
+        String cacheHolidaySameMonthStrKey = username + ":" + sameMonthStr;
+        String cacheHolidayNextMonthStrKey = username + ":" + nextMonthStr;
+        cacheHolidays.evict(cacheHolidaySameMonthStrKey);
+        cacheHolidays.evict(cacheHolidayNextMonthStrKey);
         userRepository.delete(username);
+    }
+
+    @Override @Transactional(readOnly = true)
+    public Page<User> getUsers(Integer pageNum) {
+        pageNum = pageNum == null ? 0 : pageNum;
+        Sort sort = new Sort("username");
+        Pageable pageable = new PageRequest(pageNum, 20, sort);
+        return userRepository.findAll(pageable);
     }
 
     @Override @Transactional(rollbackFor = Throwable.class)
@@ -94,7 +117,7 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
                     DateUtils.truncate(date, Calendar.DATE));
             clockId.setUser(new User(username));
             Clock clock = clockRepository.findOne(clockId);
-            Date nowDate = new Date();
+            Date nowDate = DateUtils.createNow();
             if (clock == null) {
                 clock = new Clock(clockId);
                 clock.setCreateUser(username);
@@ -124,7 +147,7 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
                 return Collections.emptyList();
             }
             Date monthDate = StringUtils.isEmpty(dateStr) ?
-                    new Date() : DateUtils.parseDate(dateStr, "yyyy-MM");
+                    DateUtils.createNow() : DateUtils.parseDate(dateStr, "yyyy-MM");
             User user = userRepository.findOne(username);
             String password = user.getPassword();
             return getClocks(username, password, monthDate);
@@ -149,7 +172,7 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
     private void doSchedule(User user, boolean isClockIn) {
         String username = user.getUsername();
         String password = user.getPassword();
-        Date nowDate = new Date();
+        Date nowDate = DateUtils.createNow();
         for (Clock clock : getClocks(username, password, nowDate)) {
             switch (clock.getType()) {
                 case Constants.CLOCK_TYPE_ALL:
@@ -164,9 +187,11 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
             }
             if (DateUtils.isSameDay(nowDate, clock.getId().getDate())) {
                 if (DpoaClient.clock(username, password, isClockIn)) {
-                    logger.info("{}{}打卡成功！", username, isClockIn ? "上班" : "下班");
+                    logger.info("{}{}打卡成功！",
+                            username, isClockIn ? "上班" : "下班");
                 } else {
-                    logger.info("{}{}打卡失败！", username, isClockIn ? "上班" : "下班");
+                    logger.info("{}{}打卡失败！",
+                            username, isClockIn ? "上班" : "下班");
                 }
                 break;
             }
@@ -229,12 +254,12 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
     }
 
     protected List<Date> getHolidayDates(String username, String password, Date monthDate) {
-        String dataStr = DateFormatUtils.format(monthDate, "yyyy-M");
-        String cacheHolidayKey = username + ":" + dataStr;
+        String dateStr = DateFormatUtils.format(monthDate, "yyyy-M");
+        String cacheHolidayKey = username + ":" + dateStr;
         @SuppressWarnings("unchecked")
         List<Date> result = cacheHolidays.get(cacheHolidayKey, List.class);
         if (CollectionUtils.isEmpty(result)) { // 暂时不考虑一个月无假期的情况
-            result = DpoaClient.holidays(username, password, dataStr);
+            result = DpoaClient.holidays(username, password, dateStr);
             cacheHolidays.put(cacheHolidayKey, result);
         }
         return result;
