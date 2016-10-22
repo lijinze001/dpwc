@@ -47,13 +47,6 @@ public class DpwcController {
         return "redirect:/schedule";
     }
 
-    @RequestMapping(path = "about", method = RequestMethod.GET)
-    public String about(Model model) {
-        initModel(model);
-        model.addAttribute("current", "about");
-        return "view";
-    }
-
     @RequestMapping(path = "admin", method = RequestMethod.GET)
     public String admin(Integer pageNum, Model model) {
         model.addAttribute("current", "admin");
@@ -66,6 +59,13 @@ public class DpwcController {
     public String admin(String username) {
         dpwcService.delUser(username);
         return "redirect:/admin";
+    }
+
+    @RequestMapping(path = "about", method = RequestMethod.GET)
+    public String about(Model model) {
+        initModel(model);
+        model.addAttribute("current", "about");
+        return "view";
     }
 
     private void initModel(Model model) {

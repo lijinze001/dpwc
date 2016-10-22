@@ -47,8 +47,8 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="active"><a sec:authentication="name">张三</a></li>
-                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/h2-console}">H2 Console</a></li>
-                <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/logfile}" th:text="#{view.navbar.view_log}">查看日志</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a target="_blank" th:href="@{/h2-console}">H2 Console</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a target="_blank" th:href="@{/logfile}" th:text="#{view.navbar.view_log}">查看日志</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                         <span th:utext="#{view.navbar.language}">语言</span> <span class="caret"></span>
@@ -70,7 +70,7 @@
     <div th:if="${current eq 'home'}" class="jumbotron">
         <h1 th:utext="#{view.home.title}">欢迎使用！</h1>
         <p th:utext="#{view.home.content}">德邦打卡系统是一款实现了考勤自动打卡功能的产品，支持简单的定制化，让你无需每天为了考勤而烦心，专心工作！</p>
-        <p><a th:utext="#{view.home.button}" href="https://github.com/chenghm123/dpwc" target="_blank" class="btn btn-default btn-lg" role="button">了解更多 »</a></p>
+        <p><a target="_blank" href="https://github.com/chenghm123/dpwc" class="btn btn-default btn-lg" role="button" th:utext="#{view.home.button}">了解更多 »</a></p>
     </div>
 
 
@@ -241,7 +241,7 @@
 
 
 <div th:utext="#{view.footer}" class="footer">
-    <p>德邦打卡项目由<a href="http://projects.spring.io/spring-boot/" target="_blank">spring-boot</a>框架，通过<a href="http://blog.csdn.net/chenghm123" target="_blank">@风依然自在</a>开发。</p>
+    <p>德邦打卡项目由<a target="_blank" href="http://projects.spring.io/spring-boot/">spring-boot</a>框架，通过<a target="_blank" href="http://blog.csdn.net/chenghm123">@风依然自在</a>开发。</p>
 </div>
 
 
