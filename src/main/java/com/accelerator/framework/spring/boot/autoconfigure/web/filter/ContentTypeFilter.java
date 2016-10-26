@@ -1,6 +1,5 @@
 package com.accelerator.framework.spring.boot.autoconfigure.web.filter;
 
-import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -8,9 +7,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.Charset;
 
-public class LogfileCharsetFilter extends OncePerRequestFilter {
+public class ContentTypeFilter extends OncePerRequestFilter {
 
     private String contentType;
 
@@ -20,9 +18,8 @@ public class LogfileCharsetFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    public void setCharset(String charset) {
-        MediaType mediaType = new MediaType(MediaType.TEXT_PLAIN, Charset.forName(charset));
-        contentType = mediaType.toString();
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
 }

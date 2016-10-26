@@ -181,7 +181,6 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
                     if (!isClockIn) break;
                 case Constants.CLOCK_TYPE_IN:
                     if (isClockIn) break;
-                case Constants.CLOCK_TYPE_NONE:
                 default:
                     continue;
             }
