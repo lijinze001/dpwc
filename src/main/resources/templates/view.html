@@ -13,6 +13,8 @@
 <body role="document">
 
 
+
+
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
         <div class="navbar-header">
@@ -62,6 +64,8 @@
         </div>
     </div>
 </nav>
+
+
 
 
 <div class="container" role="main">
@@ -171,16 +175,20 @@
                     <thead>
                     <tr>
                         <th th:utext="#{view.admin.user}">用户</th>
+                        <th th:utext="#{view.admin.name}">名称</th>
                         <th th:utext="#{view.admin.oper}">操作</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:each="user, iterStat : ${userPage.content}" th:if="${iterStat.index % 2 == 0}">
                         <td>
+                            <span th:text="${user.username}">318898</span>
+                        </td>
+                        <td>
                             <form th:action="@{/admin}" action="#" method="post" role="form">
                                 <input name="username" type="hidden" th:value="${user.username}"/>
                             </form>
-                            <span th:text="${user.username}">318898</span>
+                            <span th:text="${user.nickname}">张三</span>
                         </td>
                         <td><input type="submit" class="btn btn-default btn-sm" th:value="#{view.admin.button}" value="删除"/></td>
                     </tr>
@@ -192,16 +200,18 @@
                     <thead>
                     <tr>
                         <th th:utext="#{view.admin.user}">用户</th>
+                        <th th:utext="#{view.admin.name}">名称</th>
                         <th th:utext="#{view.admin.oper}">操作</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:each="user, iterStat : ${userPage.content}" th:if="${iterStat.index % 2 != 0}">
+                        <td><span th:text="${user.username}">318898</span></td>
                         <td>
                             <form th:action="@{/admin}" action="#" method="post" role="form">
                                 <input name="username" type="hidden" th:value="${user.username}"/>
                             </form>
-                            <span th:text="${user.username}">318898</span>
+                            <span th:text="${user.nickname}">张三</span>
                         </td>
                         <td><input type="submit" class="btn btn-default btn-sm" th:value="#{view.admin.button}" value="删除"/></td>
                     </tr>

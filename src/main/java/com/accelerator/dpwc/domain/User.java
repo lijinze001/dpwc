@@ -26,6 +26,9 @@ public class User extends BasicEntity {
     @Column(name = "USERNAME", length = 6, unique = true, nullable = false)
     private String username;
 
+    @Column(name = "NICKNAME", length = 6)
+    private String nickname;
+
     @NotBlank(message = "{com.accelerator.dpwc.model.User.password.NotBlank}")
     @Column(name = "PASSWORD", length = 32, nullable = false)
     private String password;
@@ -52,6 +55,14 @@ public class User extends BasicEntity {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public String getPassword() {
