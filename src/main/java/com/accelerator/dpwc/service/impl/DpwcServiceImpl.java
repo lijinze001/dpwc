@@ -214,8 +214,7 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         // 根据此月份最大和最小日期获取此月每天日期
         List<Date> clockDates = Lists.newArrayList(minDate);
         Date tempDate = minDate;
-        while (tempDate.before(maxDate)) {
-            tempDate = DateUtils.addDays(tempDate, 1);
+        while ((tempDate = DateUtils.addDays(tempDate, 1)).before(maxDate)) {
             clockDates.add(tempDate);
         }
         // 移除OA假期
