@@ -1,12 +1,16 @@
 package com.accelerator.framework.spring.security;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
 
 public abstract class AbstractCustomAuthenticationManager implements CustomAuthenticationManager {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     public static final String DEFAULT_ROLE_PREFIX = "ROLE_";
 

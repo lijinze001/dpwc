@@ -69,7 +69,7 @@ public class Clock extends BasicEntity {
         @Column(name = "DATE", nullable = false) @Temporal(TemporalType.DATE)
         private Date date;
 
-        public Id() {}
+        public Id() { super(); }
 
         public Id(User user) {
             this.user = user;

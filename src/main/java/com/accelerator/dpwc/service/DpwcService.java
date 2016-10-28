@@ -15,6 +15,8 @@ public interface DpwcService {
 
     Page<User> getUsers(Integer pageNum);
 
+    User getUser(String username);
+
     List<Clock> getClocks(String dateStr);
 
     void addClock(String dateStr, Integer type);
