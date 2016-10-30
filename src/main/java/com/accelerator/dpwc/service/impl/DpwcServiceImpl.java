@@ -217,23 +217,27 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
             return;
         }
         String username = user.getUsername();
+        logger.info("下拉用户[{}]Nickname开始！");
         List<Cookie> cookies = this.getCookies(username, user.getPassword());
         try {
             user.setNickname(DpoaClient.nickname(cookies));
             this.addUser(user);
         } catch (Exception e) {
-            logger.info("获取用户[{}]Nickname失败!", username, e);
+            logger.info("{}获取Nickname异常!", username, e);
         }
+        logger.info("下拉用户[{}]Nickname结束！");
     }
 
     @Override
     public void downHolidays(User user) {
         String username = user.getUsername();
         String password = user.getPassword();
+        logger.info("下拉用户[{}]假期信息开始！", username);
         Date sameMonth = DateUtils.createNow();
         this.getHolidayDates(username, password, sameMonth);
         Date nextMonth = DateUtils.addMonths(sameMonth, 1);
         this.getHolidayDates(username, password, nextMonth);
+        logger.info("下拉用户[{}]假期信息结束！", username);
     }
 
     private List<Clock> getClocks(String username, String password, Date monthDate) {
