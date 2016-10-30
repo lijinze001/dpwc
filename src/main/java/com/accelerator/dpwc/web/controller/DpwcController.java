@@ -50,7 +50,7 @@ public class DpwcController {
     @RequestMapping(path = "admin", method = RequestMethod.GET)
     public String admin(Integer pageNum, Model model) {
         model.addAttribute("current", "admin");
-        Page<User> userPage = dpwcService.getUsers(pageNum);
+        Page<User> userPage = dpwcService.getUserPage(pageNum);
         model.addAttribute("userPage", userPage);
         return "view";
     }
