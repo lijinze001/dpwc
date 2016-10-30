@@ -5,7 +5,6 @@ import com.accelerator.framework.message.NLS;
 import com.accelerator.framework.message.SpringMessageProvider;
 import com.accelerator.framework.spring.ApplicationContextHolder;
 import com.accelerator.framework.spring.boot.autoconfigure.web.filter.ContentTypeFilter;
-import org.apache.http.Consts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.endpoint.mvc.LogFileMvcEndpoint;
@@ -19,6 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
+
+import java.nio.charset.Charset;
 
 
 @Configuration
@@ -54,8 +55,8 @@ public class ApplicationContextConfiguration {
         return configurationPropertiesValidator;
     }
 
-    @Bean
-    public FilterRegistrationBean logfileContentTypeFilter(@SuppressWarnings("SpringJavaAutowiringInspection") LogFileMvcEndpoint logFileMvcEndpoint) {
+    @Bean @SuppressWarnings("SpringJavaAutowiringInspection")
+    public FilterRegistrationBean logfileContentTypeFilter(LogFileMvcEndpoint logFileMvcEndpoint) {
         FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
         String path = logFileMvcEndpoint.getPath();
         filterRegistration.addUrlPatterns(path);
@@ -63,7 +64,7 @@ public class ApplicationContextConfiguration {
             filterRegistration.addUrlPatterns(path + "/**");
             filterRegistration.addUrlPatterns(path + ".*");
         }
-        MediaType mediaType = new MediaType(MediaType.TEXT_PLAIN, Consts.UTF_8);
+        MediaType mediaType = new MediaType(MediaType.TEXT_PLAIN, Charset.defaultCharset());
         filterRegistration.setFilter(new ContentTypeFilter());
         filterRegistration.addInitParameter("contentType", mediaType.toString());
         return filterRegistration;

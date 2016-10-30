@@ -9,20 +9,28 @@ import java.util.Map;
 
 public interface DpwcService {
 
+    void addUser(User user);
+
     void addUser(String username, String password);
 
     void delUser(String username);
 
-    Page<User> getUsers(Integer pageNum);
+    List<User> getUsers();
 
-    User getUser(String username);
-
-    List<Clock> getClocks(String dateStr);
+    Page<User> getUserPage(Integer pageNum);
 
     void addClock(String dateStr, Integer type);
 
     void addClocks(Map<String, Integer> params);
 
-    void schedule(boolean isClockIn);
+    List<Clock> getClocks(String dateStr);
+
+    void clock(String username, String password, boolean isClockIn);
+
+    void clockAll(boolean isClockIn);
+
+    void downUserNickname(User user);
+
+    void downHolidays(User user);
 
 }

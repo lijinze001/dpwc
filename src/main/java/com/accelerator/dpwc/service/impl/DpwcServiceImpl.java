@@ -67,6 +67,11 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
     private UserRepository userRepository;
 
     @Override @Transactional(rollbackFor = Throwable.class)
+    public void addUser(User user) {
+        userRepository.save(user);
+    }
+
+    @Override @Transactional(rollbackFor = Throwable.class)
     public void addUser(String username, String password) {
         User user = userRepository.findOne(username);
         Date nowDate = DateUtils.createNow();
@@ -105,16 +110,16 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
     }
 
     @Override @Transactional(readOnly = true)
-    public Page<User> getUsers(Integer pageNum) {
+    public List<User> getUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override @Transactional(readOnly = true)
+    public Page<User> getUserPage(Integer pageNum) {
         pageNum = pageNum == null ? 0 : pageNum;
         Sort sort = new Sort("username");
         Pageable pageable = new PageRequest(pageNum, 20, sort);
         return userRepository.findAll(pageable);
-    }
-
-    @Override @Transactional(readOnly = true)
-    public User getUser(String username) {
-        return userRepository.findOne(username);
     }
 
     @Override @Transactional(rollbackFor = Throwable.class)
@@ -162,49 +167,73 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
                     DateUtils.createNow() : DateUtils.parseDate(dateStr, "yyyy-MM");
             User user = userRepository.findOne(username);
             String password = user.getPassword();
-            return getClocks(username, password, monthDate);
+            return this.getClocks(username, password, monthDate);
         } catch (ParseException e) {
             throw new DateParseException(e);
         }
     }
 
-    @Override @Transactional(readOnly = true)
-    public void schedule(final boolean isClockIn) {
-        for (final User user : userRepository.findAll()) {
-            int delay = ScheduleUtils.randomSecondWithTenMinutes();
-            // 10分钟内随机延迟
-            scheduledExecutorService.schedule(new Runnable() {
-                @Override public void run() {
-                    doSchedule(user, isClockIn);
-                }
-            }, delay, TimeUnit.SECONDS);
+    @Override
+    public void clock(String username, String password, boolean isClockIn) {
+        String clockDesc = isClockIn ? "上班" : "下班";
+        try {
+            if (DpoaClient.clock(username, password, isClockIn)) {
+                logger.info("{}{}打卡成功！", username, clockDesc);
+            } else {
+                logger.info("{}{}打卡失败！", username, clockDesc);
+            }
+        } catch (Exception e) {
+            logger.error("{}{}打卡异常！", username, clockDesc, e);
         }
     }
 
-    private void doSchedule(User user, boolean isClockIn) {
+    @Override @Transactional(readOnly = true)
+    public void clockAll(final boolean isClockIn) {
+        for (final User user : userRepository.findAll()) {
+            scheduledExecutorService.schedule(new Runnable() {
+                @Override public void run() {
+                    String username = user.getUsername();
+                    String password = user.getPassword();
+                    Date nowDate = DateUtils.createNow();
+                    for (Clock clock : getClocks(username, password, nowDate)) {
+                        Integer clockType = clock.getType();
+                        if ((clockType == Constants.CLOCK_TYPE_ALL // 打卡类型是否满足
+                                || (clockType == Constants.CLOCK_TYPE_OUT && !isClockIn)
+                                || (clockType == Constants.CLOCK_TYPE_IN && isClockIn))
+                                // 打卡天数是否相同
+                                && DateUtils.isSameDay(nowDate, clock.getId().getDate())) {
+                            clock(username, password, isClockIn);
+                            break;
+                        }
+                    }
+                } // 10分钟内随机延迟
+            }, ScheduleUtils.randomSecondWithTenMinutes(), TimeUnit.SECONDS);
+        }
+    }
+
+    @Override @Transactional(rollbackFor = Throwable.class)
+    public void downUserNickname(User user) {
+        if (StringUtils.isBlank(user.getNickname())) {
+            return;
+        }
+        String username = user.getUsername();
+        List<Cookie> cookies = this.getCookies(username, user.getPassword());
+        try {
+            user.setNickname(DpoaClient.nickname(cookies));
+            this.addUser(user);
+        } catch (Exception e) {
+            logger.info("获取用户[{}]Nickname失败!", username, e);
+        }
+    }
+
+    @Override
+    public void downHolidays(User user) {
         String username = user.getUsername();
         String password = user.getPassword();
-        Date nowDate = DateUtils.createNow();
-        for (Clock clock : getClocks(username, password, nowDate)) {
-            Integer clockType = clock.getType();
-            if ((clockType == Constants.CLOCK_TYPE_ALL // 打卡类型是否满足
-                    || (clockType == Constants.CLOCK_TYPE_OUT && !isClockIn)
-                    || (clockType == Constants.CLOCK_TYPE_IN && isClockIn))
-                    // 打卡天数是否相同
-                    && DateUtils.isSameDay(nowDate, clock.getId().getDate())) {
-                String clockDesc = isClockIn ? "上班" : "下班";
-                try {
-                    if (DpoaClient.clock(username, password, isClockIn)) {
-                        logger.info("{}{}打卡成功！", username, clockDesc);
-                    } else {
-                        logger.info("{}{}打卡失败！", username, clockDesc);
-                    }
-                } catch (Exception e) {
-                    logger.error("{}{}打卡异常！", username, clockDesc, e);
-                }
-                break;
-            }
-        }
+        Date sameMonth = DateUtils.createNow();
+        this.getHolidayDates(username, password, sameMonth);
+        Date nextMonth = DateUtils.addMonths(sameMonth, 1);
+        this.getHolidayDates(username, password, nextMonth);
     }
 
     private List<Clock> getClocks(String username, String password, Date monthDate) {
@@ -214,8 +243,7 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         // 根据此月份最大和最小日期获取此月每天日期
         List<Date> clockDates = Lists.newArrayList(minDate);
         Date tempDate = minDate;
-        while (tempDate.before(maxDate)) {
-            tempDate = DateUtils.addDays(tempDate, 1);
+        while ((tempDate = DateUtils.addDays(tempDate, 1)).before(maxDate)) {
             clockDates.add(tempDate);
         }
         // 移除OA假期
@@ -268,8 +296,8 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         @SuppressWarnings("unchecked")
         List<Date> result = cacheHolidays.get(cacheHolidayKey, List.class);
         if (CollectionUtils.isEmpty(result)) { // 暂时不考虑一个月无假期的情况
+            List<Cookie> cookies = this.getCookies(username, password);
             try {
-                List<Cookie> cookies = this.getCookies(username, password);
                 result = DpoaClient.holidays(cookies, dateStr);
             } catch (Exception e) {
                 logger.error("{}获取假期异常！", username, e);
