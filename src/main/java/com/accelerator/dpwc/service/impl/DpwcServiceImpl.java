@@ -217,13 +217,16 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
             return;
         }
         String username = user.getUsername();
+        logger.info("下拉用户[{}]昵称开始", username);
         List<Cookie> cookies = this.getCookies(username, user.getPassword());
         try {
             user.setNickname(DpoaClient.nickname(cookies));
-            this.addUser(user);
         } catch (Exception e) {
             logger.info("{}获取Nickname异常!", username, e);
+            return;
         }
+        logger.info("下拉用户[{}]昵称结束", username);
+        this.addUser(user);
     }
 
     @Override
@@ -296,12 +299,14 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         @SuppressWarnings("unchecked")
         List<Date> result = cacheHolidays.get(cacheHolidayKey, List.class);
         if (CollectionUtils.isEmpty(result)) { // 暂时不考虑一个月无假期的情况
+            logger.info("下拉用户[{}]{}假期开始", username, dateStr);
             List<Cookie> cookies = this.getCookies(username, password);
             try {
                 result = DpoaClient.holidays(cookies, dateStr);
             } catch (Exception e) {
                 logger.error("{}获取假期异常！", username, e);
             }
+            logger.info("下拉用户[{}]{}假期结束", username, dateStr);
             cacheHolidays.put(cacheHolidayKey, result);
         }
         return result;
