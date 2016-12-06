@@ -23,6 +23,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -37,7 +38,8 @@ public class WebSecurityAutoConfiguration {
     @Configuration
     public static class CustomWebSecurityConfiguration {
 
-        @Bean @ConditionalOnMissingBean(CustomWebSecurityConfigurerAdapter.class)
+        @Bean
+        @ConditionalOnMissingBean(CustomWebSecurityConfigurerAdapter.class)
         public CustomWebSecurityConfigurerAdapter customWebSecurityConfigurerAdapter() {
             return new CustomWebSecurityConfigurerAdapter();
         }
@@ -84,7 +86,8 @@ public class WebSecurityAutoConfiguration {
     @Configuration
     public static class AdminSecurityConfiguration {
 
-        @Bean @ConditionalOnMissingBean(AdminWebSecurityConfigurerAdapter.class)
+        @Bean
+        @ConditionalOnMissingBean(AdminWebSecurityConfigurerAdapter.class)
         public AdminWebSecurityConfigurerAdapter adminWebSecurityConfigurerAdapter() {
             return new AdminWebSecurityConfigurerAdapter();
         }
@@ -110,7 +113,9 @@ public class WebSecurityAutoConfiguration {
                     http.requiresChannel().anyRequest().requiresSecure();
                 }
                 http.requestMatcher(new AntPathRequestMatcher("/admin/**"));
-                http.sessionManagement().sessionCreationPolicy(management.getSecurity().getSessions());
+                http.sessionManagement().sessionCreationPolicy(
+                        WebSecurityAutoConfiguration.asSpringSecuritySessionCreationPolicy(
+                                management.getSecurity().getSessions()));
                 http.httpBasic().realmName(security.getBasic().getRealm());
                 http.csrf().disable();
                 http.headers().frameOptions().sameOrigin();
@@ -121,12 +126,15 @@ public class WebSecurityAutoConfiguration {
 
     }
 
-    @Configuration @ConditionalOnClass(H2ConsoleAutoConfiguration.class)
-    @AutoConfigureAfter(H2ConsoleAutoConfiguration.class) @EnableConfigurationProperties(H2ConsoleProperties.class)
+    @Configuration
+    @ConditionalOnClass(H2ConsoleAutoConfiguration.class)
+    @AutoConfigureAfter(H2ConsoleAutoConfiguration.class)
+    @EnableConfigurationProperties(H2ConsoleProperties.class)
     @ConditionalOnProperty(prefix = "security.basic", name = "enabled", havingValue = "false")
     public static class H2ConsoleSecurityConfiguration {
 
-        @Bean @ConditionalOnMissingBean(H2ConsoleWebSecurityConfigurerAdapter.class)
+        @Bean
+        @ConditionalOnMissingBean(H2ConsoleWebSecurityConfigurerAdapter.class)
         public H2ConsoleWebSecurityConfigurerAdapter h2ConsoleWebSecurityConfigurerAdapter() {
             return new H2ConsoleWebSecurityConfigurerAdapter();
         }
@@ -160,7 +168,9 @@ public class WebSecurityAutoConfiguration {
                     http.requiresChannel().anyRequest().requiresSecure();
                 }
                 http.requestMatcher(getRequestMatcher(h2Console.getPath()));
-                http.sessionManagement().sessionCreationPolicy(management.getSecurity().getSessions());
+                http.sessionManagement().sessionCreationPolicy(
+                        WebSecurityAutoConfiguration.asSpringSecuritySessionCreationPolicy(
+                                management.getSecurity().getSessions()));
                 http.httpBasic().realmName(security.getBasic().getRealm());
                 http.csrf().disable();
                 http.headers().frameOptions().sameOrigin();
@@ -170,5 +180,14 @@ public class WebSecurityAutoConfiguration {
         }
 
     }
+
+    private static SessionCreationPolicy asSpringSecuritySessionCreationPolicy(
+            Enum<?> value) {
+        if (value == null) {
+            return SessionCreationPolicy.STATELESS;
+        }
+        return SessionCreationPolicy.valueOf(value.name());
+    }
+
 
 }
