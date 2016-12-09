@@ -257,10 +257,10 @@
                 <nav>
                     <ul class="pager">
                         <li th:class="${userPage.first}?'previous disabled':'previous'" class="previous">
-                            <a th:href="${userPage.first}?'#':'@{/admin(pageNum=${userPage.number-1})}'" href="#">&larr; Older</a>
+                            <a th:href="${userPage.first}?'#':@{/admin(pageNum=${userPage.number-1})}" href="#">&larr; Older</a>
                         </li>
                         <li th:class="${userPage.last}?'next disabled':'next'" class="next">
-                            <a th:href="${userPage.last}?'#':'@{/admin(pageNum=${userPage.number+1})}'" href="#">Newer &rarr;</a>
+                            <a th:href="${userPage.last}?'#':@{/admin(pageNum=${userPage.number+1})}" href="#">Newer &rarr;</a>
                         </li>
                     </ul>
                 </nav>
