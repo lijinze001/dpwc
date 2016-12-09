@@ -6,19 +6,20 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title th:utext="#{view.title}">德邦工时打卡</title>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css"/>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap-theme.min.css}" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"
+          href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap-theme.min.css}"
+          href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap-theme.min.css"/>
     <link rel="stylesheet" th:href="@{/view.css}" href="../META-INF/resources/view.css"/>
 </head>
 <body role="document">
 
 
-
-
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -31,13 +32,16 @@
                 <li th:class="${current eq 'home'} ? 'active'" class="active">
                     <a th:href="@{/home}" th:utext="#{view.navbar.home}">首页</a>
                 </li>
-                <li sec:authorize="hasRole('USER')" th:class="${current eq 'schedule'} ? 'dropdown active': 'dropdown'" class="dropdown">
+                <li sec:authorize="hasRole('USER')" th:class="${current eq 'schedule'} ? 'dropdown active': 'dropdown'"
+                    class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                         <span th:utext="#{view.navbar.schedule}">计划</span> <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" role="menu">
-                        <li><a th:href="@{/schedule(dateStr=${sameMonth})}" th:text="#{view.navbar.same_month}">当月</a></li>
-                        <li><a th:href="@{/schedule(dateStr=${nextMonth})}" th:text="#{view.navbar.next_month}">次月</a></li>
+                        <li><a th:href="@{/schedule(dateStr=${sameMonth})}" th:text="#{view.navbar.same_month}">当月</a>
+                        </li>
+                        <li><a th:href="@{/schedule(dateStr=${nextMonth})}" th:text="#{view.navbar.next_month}">次月</a>
+                        </li>
                     </ul>
                 </li>
                 <li sec:authorize="hasRole('ADMIN')" th:class="${current eq 'admin'} ? 'active'">
@@ -50,7 +54,8 @@
             <ul class="nav navbar-nav navbar-right">
                 <li class="active"><a sec:authentication="name">张三</a></li>
                 <li sec:authorize="hasRole('ADMIN')"><a target="_blank" th:href="@{/h2-console}">H2 Console</a></li>
-                <li sec:authorize="hasRole('ADMIN')"><a target="_blank" th:href="@{/logfile}" th:text="#{view.navbar.view_log}">查看日志</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a target="_blank" th:href="@{/logfile}"
+                                                        th:text="#{view.navbar.view_log}">查看日志</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                         <span th:utext="#{view.navbar.language}">语言</span> <span class="caret"></span>
@@ -66,15 +71,14 @@
 </nav>
 
 
-
-
 <div class="container" role="main">
 
 
     <div th:if="${current eq 'home'}" class="jumbotron">
         <h1 th:utext="#{view.home.title}">欢迎使用！</h1>
         <p th:utext="#{view.home.content}">德邦打卡系统是一款实现了考勤自动打卡功能的产品，支持简单的定制化，让你无需每天为了考勤而烦心，专心工作！</p>
-        <p><a target="_blank" href="https://github.com/chenghm123/dpwc" class="btn btn-default btn-lg" role="button" th:utext="#{view.home.button}">了解更多 »</a></p>
+        <p><a target="_blank" href="https://github.com/chenghm123/dpwc" class="btn btn-default btn-lg" role="button"
+              th:utext="#{view.home.button}">了解更多 »</a></p>
     </div>
 
 
@@ -95,10 +99,18 @@
                         <form th:action="@{/schedule}" action="#" method="post" role="form">
                             <input name="date" type="hidden" th:value="${#dates.format(clock.id.date, 'yyyy-MM-dd')}"/>
                             <select name="type" class="form-control input-sm type-select">
-                                <option th:utext="#{view.schedule.clock.type.none}" th:selected="${clock.type eq -1}" style="color: red;" value="-1">不打卡</option>
-                                <option th:utext="#{view.schedule.clock.type.in}" th:selected="${clock.type eq 0}" style="color: orange;" value="0">上班卡</option>
-                                <option th:utext="#{view.schedule.clock.type.out}" th:selected="${clock.type eq 1}" style="color: orchid;" value="1">下班卡</option>
-                                <option th:utext="#{view.schedule.clock.type.all}" th:selected="${clock.type eq 2}" style="color: black;" value="2">全天卡</option>
+                                <option th:utext="#{view.schedule.clock.type.none}" th:selected="${clock.type eq -1}"
+                                        style="color: red;" value="-1">不打卡
+                                </option>
+                                <option th:utext="#{view.schedule.clock.type.in}" th:selected="${clock.type eq 0}"
+                                        style="color: orange;" value="0">上班卡
+                                </option>
+                                <option th:utext="#{view.schedule.clock.type.out}" th:selected="${clock.type eq 1}"
+                                        style="color: orchid;" value="1">下班卡
+                                </option>
+                                <option th:utext="#{view.schedule.clock.type.all}" th:selected="${clock.type eq 2}"
+                                        style="color: black;" value="2">全天卡
+                                </option>
                             </select>
                         </form>
                     </td>
@@ -124,10 +136,18 @@
                             <input name="date" type="hidden"
                                    th:value="${#dates.format(clock.id.date, 'yyyy-MM-dd')}"/>
                             <select name="type" class="form-control input-sm type-select">
-                                <option th:utext="#{view.schedule.clock.type.none}" th:selected="${clock.type eq -1}" style="color: red;" value="-1">不打卡</option>
-                                <option th:utext="#{view.schedule.clock.type.in}" th:selected="${clock.type eq 0}" style="color: orange;" value="0">上班卡</option>
-                                <option th:utext="#{view.schedule.clock.type.out}" th:selected="${clock.type eq 1}" style="color: orchid;" value="1">下班卡</option>
-                                <option th:utext="#{view.schedule.clock.type.all}" th:selected="${clock.type eq 2}" style="color: black;" value="2">全天卡</option>
+                                <option th:utext="#{view.schedule.clock.type.none}" th:selected="${clock.type eq -1}"
+                                        style="color: red;" value="-1">不打卡
+                                </option>
+                                <option th:utext="#{view.schedule.clock.type.in}" th:selected="${clock.type eq 0}"
+                                        style="color: orange;" value="0">上班卡
+                                </option>
+                                <option th:utext="#{view.schedule.clock.type.out}" th:selected="${clock.type eq 1}"
+                                        style="color: orchid;" value="1">下班卡
+                                </option>
+                                <option th:utext="#{view.schedule.clock.type.all}" th:selected="${clock.type eq 2}"
+                                        style="color: black;" value="2">全天卡
+                                </option>
                             </select>
                         </form>
                     </td>
@@ -152,14 +172,23 @@
                         <form th:action="@{/schedule}" action="#" method="post" role="form">
                             <input name="date" type="hidden" th:value="${#dates.format(clock.id.date, 'yyyy-MM-dd')}"/>
                             <select name="type" class="form-control input-sm type-select">
-                                <option th:utext="#{view.schedule.clock.type.none}" th:selected="${clock.type eq -1}" style="color: red;" value="-1">不打卡</option>
-                                <option th:utext="#{view.schedule.clock.type.in}" th:selected="${clock.type eq 0}" style="color: orange;" value="0">上班卡</option>
-                                <option th:utext="#{view.schedule.clock.type.out}" th:selected="${clock.type eq 1}" style="color: orchid;" value="1">下班卡</option>
-                                <option th:utext="#{view.schedule.clock.type.all}" th:selected="${clock.type eq 2}" style="color: black;" value="2">全天卡</option>
+                                <option th:utext="#{view.schedule.clock.type.none}" th:selected="${clock.type eq -1}"
+                                        style="color: red;" value="-1">不打卡
+                                </option>
+                                <option th:utext="#{view.schedule.clock.type.in}" th:selected="${clock.type eq 0}"
+                                        style="color: orange;" value="0">上班卡
+                                </option>
+                                <option th:utext="#{view.schedule.clock.type.out}" th:selected="${clock.type eq 1}"
+                                        style="color: orchid;" value="1">下班卡
+                                </option>
+                                <option th:utext="#{view.schedule.clock.type.all}" th:selected="${clock.type eq 2}"
+                                        style="color: black;" value="2">全天卡
+                                </option>
                             </select>
                         </form>
                     </td>
-                    <td><input type="submit" class="btn btn-default btn-sm" th:value="#{view.schedule.update}" value="更新"/></td>
+                    <td><input type="submit" class="btn btn-default btn-sm" th:value="#{view.schedule.update}"
+                               value="更新"/></td>
                 </tr>
                 </tbody>
             </table>
@@ -190,7 +219,8 @@
                             </form>
                             <span th:text="${user.nickname}">张三</span>
                         </td>
-                        <td><input type="submit" class="btn btn-default btn-sm" th:value="#{view.admin.button}" value="删除"/></td>
+                        <td><input type="submit" class="btn btn-default btn-sm" th:value="#{view.admin.button}"
+                                   value="删除"/></td>
                     </tr>
                     </tbody>
                 </table>
@@ -213,7 +243,8 @@
                             </form>
                             <span th:text="${user.nickname}">张三</span>
                         </td>
-                        <td><input type="submit" class="btn btn-default btn-sm" th:value="#{view.admin.button}" value="删除"/></td>
+                        <td><input type="submit" class="btn btn-default btn-sm" th:value="#{view.admin.button}"
+                                   value="删除"/></td>
                     </tr>
                     </tbody>
                 </table>
@@ -226,10 +257,10 @@
                 <nav>
                     <ul class="pager">
                         <li th:class="${userPage.first}?'previous disabled':'previous'" class="previous">
-                            <a th:href="${userPage.last}?'#':@{/admin(pageNum=${userPage.number - 1})}" href="#">&larr;Older</a>
+                            <a th:href="${userPage.first}?'#':'@{/admin(pageNum=${userPage.number-1})}'" href="#">&larr; Older</a>
                         </li>
                         <li th:class="${userPage.last}?'next disabled':'next'" class="next">
-                            <a th:href="${userPage.last}?'#':@{/admin(pageNum=${userPage.number + 1})}"href="#">Newer &rarr;</a>
+                            <a th:href="${userPage.last}?'#':'@{/admin(pageNum=${userPage.number+1})}'" href="#">Newer &rarr;</a>
                         </li>
                     </ul>
                 </nav>
@@ -248,17 +279,16 @@
 </div>
 
 
-
-
 <div th:utext="#{view.footer}" class="footer">
-    <p>德邦打卡项目由<a target="_blank" href="http://projects.spring.io/spring-boot/">spring-boot</a>框架，通过<a target="_blank" href="http://blog.csdn.net/chenghm123">@风依然自在</a>开发。</p>
+    <p>德邦打卡项目由<a target="_blank" href="http://projects.spring.io/spring-boot/">spring-boot</a>框架，通过<a target="_blank"
+                                                                                                      href="http://blog.csdn.net/chenghm123">@风依然自在</a>开发。
+    </p>
 </div>
 
 
-
-
 <script th:src="@{/webjars/jquery/jquery.min.js}" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-<script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}" src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"
+        src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 <script th:src="@{/view.js}" src="../META-INF/resources/view.js"></script>
 </body>
 </html>
