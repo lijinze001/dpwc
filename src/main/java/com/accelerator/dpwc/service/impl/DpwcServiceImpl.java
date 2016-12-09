@@ -48,7 +48,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-@Service("dpwcService") @EnableCaching
+@Service("dpwcService")
+@EnableCaching
 public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcService, InitializingBean {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -57,7 +58,8 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
 
     private Cache cacheHolidays;
 
-    @Autowired @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
+    @Autowired
+    @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
     private SecurityProperties security;
 
     @Resource
@@ -66,12 +68,14 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
     @Resource
     private UserRepository userRepository;
 
-    @Override @Transactional(rollbackFor = Throwable.class)
+    @Override
+    @Transactional(rollbackFor = Throwable.class)
     public void addUser(User user) {
         userRepository.save(user);
     }
 
-    @Override @Transactional(rollbackFor = Throwable.class)
+    @Override
+    @Transactional(rollbackFor = Throwable.class)
     public void addUser(String username, String password) {
         User user = userRepository.findOne(username);
         Date nowDate = DateUtils.createNow();
@@ -93,7 +97,8 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         this.resizeScheduledThreadPool();
     }
 
-    @Override @Transactional(rollbackFor = Throwable.class)
+    @Override
+    @Transactional(rollbackFor = Throwable.class)
     public void delUser(String username) {
         if (StringUtils.isEmpty(username) || security.getUser().getName().equals(username)) {
             return;
@@ -109,12 +114,14 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         userRepository.delete(username);
     }
 
-    @Override @Transactional(readOnly = true)
+    @Override
+    @Transactional(readOnly = true)
     public List<User> getUsers() {
         return userRepository.findAll();
     }
 
-    @Override @Transactional(readOnly = true)
+    @Override
+    @Transactional(readOnly = true)
     public Page<User> getUserPage(Integer pageNum) {
         pageNum = pageNum == null ? 0 : pageNum;
         Sort sort = new Sort("username");
@@ -122,7 +129,8 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         return userRepository.findAll(pageable);
     }
 
-    @Override @Transactional(rollbackFor = Throwable.class)
+    @Override
+    @Transactional(rollbackFor = Throwable.class)
     public void addClock(String dateStr, Integer type) {
         try {
             if (StringUtils.isEmpty(dateStr)) {
@@ -149,14 +157,16 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         }
     }
 
-    @Override @Transactional(rollbackFor = Throwable.class)
+    @Override
+    @Transactional(rollbackFor = Throwable.class)
     public void addClocks(Map<String, Integer> params) {
         for (Map.Entry<String, Integer> param : params.entrySet()) {
             addClock(param.getKey(), param.getValue());
         }
     }
 
-    @Override @Transactional(readOnly = true)
+    @Override
+    @Transactional(readOnly = true)
     public List<Clock> getClocks(String dateStr) {
         try {
             String username = this.getCurrentUsername();
@@ -187,11 +197,13 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         }
     }
 
-    @Override @Transactional(readOnly = true)
+    @Override
+    @Transactional(readOnly = true)
     public void clockAll(final boolean isClockIn) {
         for (final User user : userRepository.findAll()) {
             scheduledExecutorService.schedule(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     String username = user.getUsername();
                     String password = user.getPassword();
                     Date nowDate = DateUtils.createNow();
@@ -211,7 +223,8 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         }
     }
 
-    @Override @Transactional(rollbackFor = Throwable.class)
+    @Override
+    @Transactional(rollbackFor = Throwable.class)
     public void downUserNickname(User user) {
         if (StringUtils.isNotBlank(user.getNickname())) {
             return;
@@ -235,8 +248,11 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         String password = user.getPassword();
         Date sameMonth = DateUtils.createNow();
         this.getHolidayDates(username, password, sameMonth);
-        Date nextMonth = DateUtils.addMonths(sameMonth, 1);
-        this.getHolidayDates(username, password, nextMonth);
+        // 通过下个月第一天判断是否需要下拉下个月的假期
+        Date nextMonth = DateUtils.ceiling(sameMonth, Calendar.MONTH);
+        if (DateUtils.addDays(nextMonth, -6).before(sameMonth)) {
+            this.getHolidayDates(username, password, nextMonth);
+        }
     }
 
     private List<Clock> getClocks(String username, String password, Date monthDate) {
