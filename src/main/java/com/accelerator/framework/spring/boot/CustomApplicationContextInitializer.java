@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationContextInitializer;
 
 public class CustomApplicationContextInitializer implements ApplicationContextInitializer<EmbeddedWebApplicationContext> {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public void initialize(EmbeddedWebApplicationContext applicationContext) {
