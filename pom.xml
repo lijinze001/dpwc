@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.accelerator</groupId>
     <artifactId>dpwc</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
     <properties>
         <!-- Dependency Versions -->
         <commons-lang3.version>3.5</commons-lang3.version>
