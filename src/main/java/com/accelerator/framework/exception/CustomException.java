@@ -89,7 +89,7 @@ public class CustomException extends RuntimeException {
     }
 
     public CustomException loggable(boolean loggable) {
-        setLogStackTrace(loggable);
+        this.setLogStackTrace(loggable);
         return this;
     }
 
