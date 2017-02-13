@@ -216,32 +216,12 @@ public abstract class DpoaClient {
     public static List<Cookie> login(String username, String password) {
         // 定义登录URL地址
         String url = "http://ioa.deppon.com/portal/login/login_loginIn.action";
-        // 初始化必要信息
-        ResponseData responseData = HttpClientHelper.doPost(url,
-                Collections.singletonMap("username", StringUtils.EMPTY));
         // 构建登录参数
-        Map<String, String> params = Maps.newHashMapWithExpectedSize(6);
-        org.jsoup.nodes.Document document = Jsoup.parse(responseData.getContentStr());
-        Elements elements = document.select("input[name=cookie][type=hidden]");
-        if (!CollectionUtils.isEmpty(elements)) {
-            params.put("cookie", elements.first().val());
-        }
-        elements = document.select("input[name=casaction][type=hidden]");
-        if (!CollectionUtils.isEmpty(elements)) {
-            params.put("casaction", elements.first().val());
-        }
-        elements = document.select("input[name=lt][type=hidden]");
-        if (!CollectionUtils.isEmpty(elements)) {
-            params.put("ltname", elements.first().val());
-        }
-        elements = document.select("input[name=service][type=hidden]");
-        if (!CollectionUtils.isEmpty(elements)) {
-            params.put("service", elements.first().val());
-        }
+        Map<String, String> params = Maps.newHashMapWithExpectedSize(2);
         params.put("username", username);
         params.put("password", password);
         // 执行登录请求
-        responseData = HttpClientHelper.doPost(url, LOGIN_HEADERS, responseData.getCookies(), params);
+        ResponseData responseData = HttpClientHelper.doPost(url, LOGIN_HEADERS, Collections.emptyList(), params);
         if (responseData.getStatusCode() == HttpStatus.SC_MOVED_TEMPORARILY) {
             return responseData.getCookies();
         }
