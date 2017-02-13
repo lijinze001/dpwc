@@ -15,8 +15,7 @@ public class HttpClientHelperTest {
 
     @Test
     public void doGet() throws Exception {
-        String username = "318898";
-        String password = "C@763124";
+
     }
 
 }
