@@ -29,22 +29,22 @@ public class DpwcController {
     public String home(Model model) {
         initModel(model);
         model.addAttribute("current", "home");
-        return "view";
+        return "main";
     }
 
-    @RequestMapping(path = "schedule", method = RequestMethod.GET)
-    public String schedule(String dateStr, Model model) {
+    @RequestMapping(path = "sched", method = RequestMethod.GET)
+    public String sched(String dateStr, Model model) {
         initModel(model);
-        model.addAttribute("current", "schedule");
+        model.addAttribute("current", "sched");
         List<Clock> clocks = dpwcService.getClocks(dateStr);
         model.addAttribute("clocks", clocks);
-        return "view";
+        return "main";
     }
 
-    @RequestMapping(path = "schedule", method = RequestMethod.POST)
-    public String schedule(String date, Integer type) {
+    @RequestMapping(path = "sched", method = RequestMethod.POST)
+    public String sched(String date, Integer type) {
         dpwcService.addClock(date, type);
-        return "redirect:/schedule";
+        return "redirect:/sched";
     }
 
     @RequestMapping(path = "admin", method = RequestMethod.GET)
@@ -52,7 +52,7 @@ public class DpwcController {
         model.addAttribute("current", "admin");
         Page<User> userPage = dpwcService.getUserPage(pageNum);
         model.addAttribute("userPage", userPage);
-        return "view";
+        return "main";
     }
 
     @RequestMapping(path = "admin", method = RequestMethod.POST)
@@ -65,7 +65,7 @@ public class DpwcController {
     public String about(Model model) {
         initModel(model);
         model.addAttribute("current", "about");
-        return "view";
+        return "main";
     }
 
     private void initModel(Model model) {

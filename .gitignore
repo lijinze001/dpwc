@@ -4,6 +4,6 @@
 .settings
 .externalToolBuilders
 target
-*.iml
+dpwc.iml
 data
 logs
