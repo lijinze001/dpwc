@@ -59,6 +59,7 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
     private Cache cacheHolidays;
 
     @Autowired
+    @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
     private SecurityProperties security;
 
     @Resource

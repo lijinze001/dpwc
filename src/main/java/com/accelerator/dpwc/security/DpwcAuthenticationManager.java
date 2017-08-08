@@ -1,5 +1,6 @@
 package com.accelerator.dpwc.security;
 
+import com.accelerator.dpwc.DpoaClient;
 import com.accelerator.dpwc.exception.AuthException;
 import com.accelerator.dpwc.exception.ErrorCode;
 import com.accelerator.dpwc.service.DpwcService;
@@ -28,14 +29,14 @@ public class DpwcAuthenticationManager extends AbstractCustomAuthenticationManag
     @Override
     public Authentication attemptAuthentication(String username, String password) throws CustomException {
         try {
-           // if (DpoaClient.check(username, password)) {
+            if (DpoaClient.check(username, password)) {
                 List<GrantedAuthority> grantedAuthorities =
                         Collections.singletonList(getGrantedAuthority(DEFAULT_ROLE_NAME));
                 if (!security.getUser().getName().equals(username)) {
                     dpwcService.addUser(username, password);
                 }
                 return new UsernamePasswordAuthenticationToken(username, password, grantedAuthorities);
-           // }
+            }
         } catch (Exception e) {
             logger.error("{}密码校验异常！", username, e);
         }
