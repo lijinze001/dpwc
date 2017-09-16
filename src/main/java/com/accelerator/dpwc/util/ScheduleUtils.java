@@ -4,8 +4,8 @@ import org.apache.commons.lang3.RandomUtils;
 
 public abstract class ScheduleUtils {
 
-    public static int randomSecondWithTenMinutes() {
-        return RandomUtils.nextInt(0, 10 * 60 + 1);
+    public static int randomSecondWithMinutes(int minutes) {
+        return RandomUtils.nextInt(0, minutes * 60 + 1);
     }
 
 }

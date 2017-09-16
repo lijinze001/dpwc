@@ -38,18 +38,12 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-@Service("dpwcService")
-@EnableCaching
+@Service("dpwcService") @EnableCaching
 public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcService, InitializingBean {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -58,8 +52,7 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
 
     private Cache cacheHolidays;
 
-    @Autowired
-    @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
+    @Autowired @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
     private SecurityProperties security;
 
     @Resource
@@ -68,14 +61,12 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
     @Resource
     private UserRepository userRepository;
 
-    @Override
-    @Transactional(rollbackFor = Throwable.class)
+    @Override @Transactional(rollbackFor = Throwable.class)
     public void addUser(User user) {
         userRepository.save(user);
     }
 
-    @Override
-    @Transactional(rollbackFor = Throwable.class)
+    @Override @Transactional(rollbackFor = Throwable.class)
     public void addUser(String username, String password) {
         User user = userRepository.findOne(username);
         Date nowDate = DateUtils.createNow();
@@ -97,8 +88,7 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         this.resizeScheduledThreadPool();
     }
 
-    @Override
-    @Transactional(rollbackFor = Throwable.class)
+    @Override @Transactional(rollbackFor = Throwable.class)
     public void delUser(String username) {
         if (StringUtils.isEmpty(username) || security.getUser().getName().equals(username)) {
             return;
@@ -114,14 +104,12 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         userRepository.delete(username);
     }
 
-    @Override
-    @Transactional(readOnly = true)
+    @Override @Transactional(readOnly = true)
     public List<User> getUsers() {
         return userRepository.findAll();
     }
 
-    @Override
-    @Transactional(readOnly = true)
+    @Override @Transactional(readOnly = true)
     public Page<User> getUserPage(Integer pageNum) {
         pageNum = pageNum == null ? 0 : pageNum;
         Sort sort = new Sort("username");
@@ -129,8 +117,7 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         return userRepository.findAll(pageable);
     }
 
-    @Override
-    @Transactional(rollbackFor = Throwable.class)
+    @Override @Transactional(rollbackFor = Throwable.class)
     public void addClock(String dateStr, Integer type) {
         try {
             if (StringUtils.isEmpty(dateStr)) {
@@ -157,16 +144,14 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         }
     }
 
-    @Override
-    @Transactional(rollbackFor = Throwable.class)
+    @Override @Transactional(rollbackFor = Throwable.class)
     public void addClocks(Map<String, Integer> params) {
         for (Map.Entry<String, Integer> param : params.entrySet()) {
             addClock(param.getKey(), param.getValue());
         }
     }
 
-    @Override
-    @Transactional(readOnly = true)
+    @Override @Transactional(readOnly = true)
     public List<Clock> getClocks(String dateStr) {
         try {
             String username = this.getCurrentUsername();
@@ -197,34 +182,29 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         }
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public void clockAll(final boolean isClockIn) {
+    @Override @Transactional(readOnly = true)
+    public void clockAll(final boolean isClockIn, int offsetMinutes) {
         for (final User user : userRepository.findAll()) {
-            scheduledExecutorService.schedule(new Runnable() {
-                @Override
-                public void run() {
-                    String username = user.getUsername();
-                    String password = user.getPassword();
-                    Date nowDate = DateUtils.createNow();
-                    for (Clock clock : getClocks(username, password, nowDate)) {
-                        Integer clockType = clock.getType();
-                        if ((clockType == Constants.CLOCK_TYPE_ALL // 打卡类型是否满足
-                                || (clockType == Constants.CLOCK_TYPE_OUT && !isClockIn)
-                                || (clockType == Constants.CLOCK_TYPE_IN && isClockIn))
-                                // 打卡天数是否相同
-                                && DateUtils.isSameDay(nowDate, clock.getId().getDate())) {
-                            clock(username, password, isClockIn);
-                            break;
-                        }
+            scheduledExecutorService.schedule(() -> {
+                String username = user.getUsername();
+                String password = user.getPassword();
+                Date nowDate = DateUtils.createNow();
+                for (Clock clock : this.getClocks(username, password, nowDate)) {
+                    Integer clockType = clock.getType();
+                    if ((clockType == Constants.CLOCK_TYPE_ALL // 打卡类型是否满足
+                            || (clockType == Constants.CLOCK_TYPE_OUT && !isClockIn)
+                            || (clockType == Constants.CLOCK_TYPE_IN && isClockIn))
+                            // 打卡天数是否相同
+                            && DateUtils.isSameDay(nowDate, clock.getId().getDate())) {
+                        this.clock(username, password, isClockIn);
+                        break;
                     }
-                } // 10分钟内随机延迟
-            }, ScheduleUtils.randomSecondWithTenMinutes(), TimeUnit.SECONDS);
+                }
+            }, ScheduleUtils.randomSecondWithMinutes(offsetMinutes), TimeUnit.SECONDS);
         }
     }
 
-    @Override
-    @Transactional(rollbackFor = Throwable.class)
+    @Override @Transactional(rollbackFor = Throwable.class)
     public void downUserNickname(User user) {
         if (StringUtils.isNotBlank(user.getNickname())) {
             return;
@@ -298,13 +278,10 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
         }
         // 对打卡结果排序
         List<Clock> result = Lists.newArrayList(tempMap.values());
-        Collections.sort(result, new Comparator<Clock>() {
-            @Override
-            public int compare(Clock clock1, Clock clock2) {
-                Date clock1Date = clock1.getId().getDate();
-                Date clock2Date = clock2.getId().getDate();
-                return clock1Date.compareTo(clock2Date);
-            }
+        Collections.sort(result, (clock1, clock2) -> {
+            Date clock1Date = clock1.getId().getDate();
+            Date clock2Date = clock2.getId().getDate();
+            return clock1Date.compareTo(clock2Date);
         });
         return result;
     }
@@ -344,7 +321,7 @@ public class DpwcServiceImpl extends ApplicationObjectSupport implements DpwcSer
     }
 
     private void initializeCacheHolidays() {
-        ApplicationContext applicationContext = getApplicationContext();
+        ApplicationContext applicationContext = super.getApplicationContext();
         CacheManager cacheManager = applicationContext.getBean("cacheManager", CacheManager.class);
         cacheHolidays = cacheManager.getCache("holidays");
     }

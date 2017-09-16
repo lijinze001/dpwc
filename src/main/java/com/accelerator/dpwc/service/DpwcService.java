@@ -27,7 +27,7 @@ public interface DpwcService {
 
     void clock(String username, String password, boolean isClockIn);
 
-    void clockAll(boolean isClockIn);
+    void clockAll(boolean isClockIn, int offsetMinutes);
 
     void downUserNickname(User user);
 
