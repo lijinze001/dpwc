@@ -32,7 +32,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 
     @Override
     public Validator getValidator() {
-        ApplicationContext applicationContext = ApplicationContextHolder.get();
+        ApplicationContext applicationContext = ApplicationContextHolder.getRequiredApplicationContext();
         Validator validator = applicationContext.getBean(
                 ConfigurationPropertiesBindingPostProcessor.VALIDATOR_BEAN_NAME,
                 Validator.class);

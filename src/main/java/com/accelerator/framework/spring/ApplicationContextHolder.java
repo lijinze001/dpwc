@@ -1,43 +1,32 @@
 package com.accelerator.framework.spring;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ApplicationObjectSupport;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
-public final class ApplicationContextHolder extends ApplicationObjectSupport implements InitializingBean {
+public class ApplicationContextHolder implements ApplicationListener<ContextRefreshedEvent> {
 
-    private static ApplicationContextHolder applicationContextHolder;
+    private static ApplicationContextHolder instance;
 
-    public static final ApplicationContext get() {
-        if (applicationContextHolder == null) {
-            applicationContextHolder = new ApplicationContextHolder();
+    private static ApplicationContext applicationContext;
+
+    public static ApplicationContext getRequiredApplicationContext() {
+        if (applicationContext == null) {
+            throw new IllegalStateException(
+                    "ApplicationContextHolder instance [" + instance + "] does not run in an ApplicationContext");
         }
-        return applicationContextHolder.getApplicationContext();
+        return getApplicationContext();
+    }
+
+    public static ApplicationContext getApplicationContext() {
+        return applicationContext;
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        applicationContextHolder = this;
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        applicationContext = event.getApplicationContext();
+        instance = this;
     }
 
-    @Override
-    protected boolean isContextRequired() {
-        return super.isContextRequired();
-    }
-
-    @Override
-    protected Class<?> requiredContextClass() {
-        return super.requiredContextClass();
-    }
-
-    @Override
-    protected void initApplicationContext(ApplicationContext context) throws BeansException {
-        super.initApplicationContext(context);
-    }
-
-    @Override
-    protected void initApplicationContext() throws BeansException {
-        super.initApplicationContext();
-    }
 }
+

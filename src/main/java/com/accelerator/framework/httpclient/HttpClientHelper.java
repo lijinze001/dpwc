@@ -170,7 +170,7 @@ public abstract class HttpClientHelper {
     }
 
     public static CloseableHttpClient getHttpClient() {
-        ApplicationContext applicationContext = ApplicationContextHolder.get();
+        ApplicationContext applicationContext = ApplicationContextHolder.getRequiredApplicationContext();
         return applicationContext.getBean(HTTP_CLIENT_BEAN_NAME, CloseableHttpClient.class);
     }
 
@@ -191,7 +191,7 @@ public abstract class HttpClientHelper {
         } finally {
             request.releaseConnection();
             HttpClientUtils.closeQuietly(response);
-            ApplicationContext applicationContext = ApplicationContextHolder.get();
+            ApplicationContext applicationContext = ApplicationContextHolder.getRequiredApplicationContext();
             if (!applicationContext.isSingleton(HTTP_CLIENT_BEAN_NAME)) {
                 HttpClientUtils.closeQuietly(httpClient);
             }

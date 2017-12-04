@@ -30,7 +30,7 @@ public abstract class NLS {
     }
 
     public static MessageProvider getMessageProvider() {
-        ApplicationContext applicationContext = ApplicationContextHolder.get();
+        ApplicationContext applicationContext = ApplicationContextHolder.getRequiredApplicationContext();
         return applicationContext.getBean(MESSAGE_PROVIDER_BEAN_NAME, MessageProvider.class);
     }
 
